@@ -3,81 +3,65 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cyber Security Threat Dashboard</title>
-
-<!-- Chart.js CDN -->
+<title>Cyber Security Threat Dashboard - Real-Time</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <style>
-  :root{
-    --bg:#0b0f19;
-    --panel:#0f1724;
-    --muted:#97a6b2;
-    --neon1:#00eaff;
-    --neon2:#00ff88;
-    --accent:#06b6d4;
-  }
-  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,sans-serif}
-  body{
-    background:var(--bg);
-    color:#e6f9ff;
-    padding:16px;
-  }
+:root{
+  --bg:#0b0f19; --panel:#0f1724; --muted:#97a6b2;
+  --neon1:#00eaff; --neon2:#00ff88; --neon3:#ff00ff; --accent:#06b6d4;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,sans-serif}
+body{background:var(--bg);color:#e6f9ff;padding:16px;transition:0.3s;}
+header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
+h1{font-size:22px;text-shadow:0 0 8px var(--neon1);}
+.subtitle{font-size:13px;color:var(--muted);text-shadow:0 0 4px #0f1724;}
+.status-badge{padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:8px;text-shadow:0 0 6px #000;}
+.status-sec{background:#063b2f;color:var(--neon2);}
+.status-mod{background:#4b3a05;color:#ffea8a;}
+.status-high{background:#3b0f12;color:#ff7777;animation:glowPulse 1.5s infinite alternate;}
+@keyframes glowPulse{
+  0%{text-shadow:0 0 8px #ff5555,0 0 12px #ff2222;}
+  50%{text-shadow:0 0 14px #ff8888,0 0 20px #ff4444;}
+  100%{text-shadow:0 0 8px #ff5555,0 0 12px #ff2222;}
+}
 
-  /* Header */
-  header{
-    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;
-  }
-  h1{font-size:22px;}
-  .subtitle{font-size:13px;color:var(--muted)}
+/* Layout */
+.grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
+.card{background:var(--panel); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);
+box-shadow:0 0 10px rgba(0,255,255,0.15),0 0 20px rgba(0,255,200,0.1);
+transition:0.3s;}
+.card:hover{box-shadow:0 0 20px var(--neon1),0 0 30px var(--neon2);transform:translateY(-2px);}
+.col-3{grid-column:span 3;}.col-4{grid-column:span 4;}.col-5{grid-column:span 5;}.col-6{grid-column:span 6;}.col-7{grid-column:span 7;}.col-12{grid-column:span 12;}
+@media (max-width:1000px){.col-3,.col-4,.col-5,.col-6,.col-7{grid-column:span 12}}
 
-  .status-badge{
-    padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:8px;
-  }
-  .status-sec{background:#063b2f;color:var(--neon2)}
-  .status-mod{background:#4b3a05;color:#ffea8a}
-  .status-high{background:#3b0f12;color:#ffd6d6}
+/* Summary */
+.stat-title{font-size:12px;color:var(--muted);margin-bottom:6px;text-shadow:0 0 4px #000;}
+.stat-value{font-size:22px;font-weight:800;text-shadow:0 0 8px var(--neon1);}
 
-  /* Layout */
-  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
-  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);}
-  .col-3{grid-column:span 3;}
-  .col-4{grid-column:span 4;}
-  .col-5{grid-column:span 5;}
-  .col-6{grid-column:span 6;}
-  .col-7{grid-column:span 7;}
-  .col-12{grid-column:span 12;}
+/* Buttons */
+.btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;transition:all 0.3s;text-shadow:0 0 4px #000;}
+.btn-neon{background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#002;box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);animation:btnGlow 2s infinite alternate;}
+.btn-neon:hover{box-shadow:0 0 18px var(--neon1),0 0 28px var(--neon2);transform:translateY(-2px);}
+@keyframes btnGlow{0%{box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);}50%{box-shadow:0 0 16px var(--neon1),0 0 26px var(--neon2);}100%{box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);}}
+.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--neon1);}
+.btn-ghost:hover{background:rgba(0,255,200,0.05);}
 
-  @media (max-width:1000px){
-    .col-3,.col-4,.col-5,.col-6,.col-7{grid-column:span 12}
-  }
+/* Table */
+table{width:100%;border-collapse:collapse;font-size:13px;overflow-x:auto;display:block;}
+th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+th{color:var(--muted);font-size:12px;}
+.sev-high{color:#ff7b7b;font-weight:700;text-shadow:0 0 4px #ff0000;}
+.sev-med{color:#ffd27a;font-weight:700;text-shadow:0 0 4px #ff8800;}
+.sev-low{color:#8fffc8;font-weight:700;text-shadow:0 0 4px #00ff88;}
 
-  /* Summary */
-  .stat-title{font-size:12px;color:var(--muted);margin-bottom:6px}
-  .stat-value{font-size:22px;font-weight:800}
+/* Progress bars */
+.progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--neon1),var(--neon2));transition:width 0.5s ease-in-out;animation:barPulse 1.5s infinite alternate;}
+@keyframes barPulse{0%{opacity:0.8;}50%{opacity:1;}100%{opacity:0.8;}}
 
-  /* Buttons */
-  .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;transition:all 0.2s;}
-  .btn-neon{background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#002;box-shadow:0 6px 18px rgba(0,255,200,0.2);}
-  .btn-neon:hover{box-shadow:0 8px 24px rgba(0,255,200,0.4);transform:translateY(-2px);}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--neon1);}
-  .btn-ghost:hover{background:rgba(0,255,200,0.05);}
-
-  /* Table */
-  table{width:100%;border-collapse:collapse;font-size:13px;overflow-x:auto;display:block;}
-  th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
-  th{color:var(--muted);font-size:12px;}
-  .sev-high{color:#ff7b7b;font-weight:700}
-  .sev-med{color:#ffd27a;font-weight:700}
-  .sev-low{color:#8fffc8;font-weight:700}
-
-  /* Progress bars */
-  .progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden}
-  .progress-fill{height:100%;background:linear-gradient(90deg,var(--neon1),var(--neon2));transition:width 0.5s ease-in-out;}
-
-  /* Footer */
-  footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center;}
-
+/* Footer */
+footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center;text-shadow:0 0 4px #000;}
 </style>
 </head>
 <body>
@@ -85,18 +69,14 @@
 <header>
   <div>
     <h1>Cyber Threat Detection Dashboard</h1>
-    <div class="subtitle">Responsive, single-file, real-time monitoring</div>
+    <div class="subtitle">Real-time Neon Monitoring</div>
   </div>
   <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px">
     <div id="statusBadge" class="status-badge status-sec">Secure</div>
-    <div style="text-align:right">
-      <div class="subtitle">Last update</div>
-      <div id="lastUpdate" class="subtitle">--</div>
-    </div>
+    <div style="text-align:right"><div class="subtitle">Last update</div><div id="lastUpdate" class="subtitle">--</div></div>
   </div>
 </header>
 
-<!-- Top summary -->
 <div class="grid" style="margin-bottom:16px">
   <div class="card col-3"><div class="stat-title">Total Threats</div><div id="totalThreats" class="stat-value">0</div></div>
   <div class="card col-3"><div class="stat-title">High</div><div id="highThreats" class="stat-value">0</div></div>
@@ -105,7 +85,6 @@
 </div>
 
 <div class="grid">
-  <!-- Left Column -->
   <div class="col-5">
     <div class="card" style="margin-bottom:12px">
       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
@@ -136,7 +115,6 @@
     </div>
   </div>
 
-  <!-- Right Column -->
   <div class="col-7">
     <div class="card" style="height:360px;display:flex;flex-direction:column">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
@@ -152,20 +130,19 @@
     <div class="card" style="margin-top:12px">
       <div style="font-weight:800;margin-bottom:8px">Notes</div>
       <div class="subtitle">
-        • Mobile & desktop responsive<br>
-        • Replace example API / WebSocket URLs<br>
-        • Bluetooth works on HTTPS / localhost
+        • Real-time API / WebSocket / Bluetooth<br>
+        • Neon theme, mobile & desktop ready<br>
+        • HTTPS required for Bluetooth
       </div>
     </div>
   </div>
 </div>
 
-<footer>Single-file responsive dashboard — Chart.js via CDN</footer>
+<footer>Neon Cyber Dashboard — Real-Time Integration</footer>
 
 <script>
-/* Utility */
 function byId(id){return document.getElementById(id)}
-function nowIso(){ return new Date().toLocaleString() }
+function nowIso(){ return new Date().toLocaleTimeString() }
 
 /* Chart setup */
 const ctx = byId('trendChart').getContext('2d')
@@ -174,20 +151,19 @@ const initialData = Array.from({length:12}).map(()=>0)
 const chart = new Chart(ctx,{
   type:'line',
   data:{labels:initialLabels,datasets:[
-    {label:'High',data:initialData.slice(),borderColor:'#ff7b7b',tension:0.3,fill:false,pointRadius:2},
-    {label:'Medium',data:initialData.slice(),borderColor:'#ffd27a',tension:0.3,fill:false,pointRadius:2},
-    {label:'Low',data:initialData.slice(),borderColor:'#8fffc8',tension:0.3,fill:false,pointRadius:2}
+    {label:'High',data:initialData.slice(),borderColor:'#ff0077',tension:0.3,fill:false,pointRadius:2,pointBackgroundColor:'#ff0077',borderWidth:3},
+    {label:'Medium',data:initialData.slice(),borderColor:'#ff8800',tension:0.3,fill:false,pointRadius:2,pointBackgroundColor:'#ff8800',borderWidth:3},
+    {label:'Low',data:initialData.slice(),borderColor:'#00ff88',tension:0.3,fill:false,pointRadius:2,pointBackgroundColor:'#00ff88',borderWidth:3}
   ]},
   options:{animation:false,scales:{x:{grid:{color:'rgba(255,255,255,0.03)'}},y:{grid:{color:'rgba(255,255,255,0.03)'}}},plugins:{legend:{labels:{color:'#bfeffd'}}}}
 })
 
-/* Update Dashboard */
+/* Dashboard updater */
 function updateDashboard(data){
   byId('totalThreats').textContent = data.total ?? ((data.high??0)+(data.medium??0)+(data.low??0))
   byId('highThreats').textContent = data.high ?? 0
   byId('medThreats').textContent = data.medium ?? 0
   byId('lowThreats').textContent = data.low ?? 0
-  byId('deviceStatus').textContent = 'Last sync: '+(data.timestamp ? new Date(data.timestamp).toLocaleString() : nowIso())
   byId('lastUpdate').textContent = nowIso()
 
   const statusBadge = byId('statusBadge')
@@ -196,6 +172,7 @@ function updateDashboard(data){
   else if(high>=4){statusBadge.className='status-badge status-mod';statusBadge.textContent='Moderate'}
   else{statusBadge.className='status-badge status-sec';statusBadge.textContent='Secure'}
 
+  // Alerts
   const alertsTable = byId('alertsTable')
   alertsTable.innerHTML=''
   const recent = data.recentAlerts ?? []
@@ -205,6 +182,7 @@ function updateDashboard(data){
     alertsTable.appendChild(tr)
   }
 
+  // Active threats
   const activeEl=byId('activeThreats')
   activeEl.innerHTML=''
   const active=data.active ?? []
@@ -215,18 +193,13 @@ function updateDashboard(data){
     activeEl.appendChild(wrap)
   }
 
-  // push chart
+  // Chart update
   const h=data.high??0,m=data.medium??0,l=data.low??0
-  pushToChart(h,m,l)
-}
-
-function pushToChart(h,m,l){
-  const maxPoints=12
   chart.data.labels.push(new Date().toLocaleTimeString())
   chart.data.datasets[0].data.push(h)
   chart.data.datasets[1].data.push(m)
   chart.data.datasets[2].data.push(l)
-  while(chart.data.labels.length>maxPoints){chart.data.labels.shift();chart.data.datasets.forEach(ds=>ds.data.shift())}
+  while(chart.data.labels.length>12){chart.data.labels.shift();chart.data.datasets.forEach(ds=>ds.data.shift())}
   chart.update()
 }
 
@@ -234,31 +207,66 @@ function pushToChart(h,m,l){
 let mockRunning=true
 const types=['Malware','Port Scan','Unauthorized Login','Phishing','Ransomware']
 function randomInt(a,b){return Math.floor(Math.random()*(b-a+1))+a}
-
 function generateMock(){
   const high=randomInt(0,12),med=randomInt(0,18),low=randomInt(0,28),total=high+med+low
   const recent=Array.from({length:6}).map(()=>({time:new Date().toLocaleTimeString(),type:types[randomInt(0,types.length-1)],severity:['Low','Medium','High'][randomInt(0,2)],src:`${randomInt(10,255)}.${randomInt(0,255)}.${randomInt(0,255)}.${randomInt(1,254)}`}))
   const active=[{name:'Suspicious Login Bot',severity:'High',progress:randomInt(10,90)},{name:'Unknown Outbound Traffic',severity:'Medium',progress:randomInt(20,85)}]
   return {total,high,medium:med,low,recentAlerts:recent,active,timestamp:Date.now()}
 }
-
 let mockInterval=setInterval(()=>{if(!mockRunning) return; updateDashboard(generateMock())},5000)
 updateDashboard(generateMock())
-byId('toggleMock').addEventListener('click',()=>{
-  mockRunning=!mockRunning
-  byId('mockStatus').textContent=`Mocking: ${mockRunning?'ON':'OFF'}`
-  byId('toggleMock').textContent=mockRunning?'Stop Mock':'Start Mock'
-})
+byId('toggleMock').addEventListener('click',()=>{mockRunning=!mockRunning;byId('mockStatus').textContent=`Mocking: ${mockRunning?'ON':'OFF'}`;byId('toggleMock').textContent=mockRunning?'Stop Mock':'Start Mock'})
 
-/* Device sync placeholders */
-async function connectBluetooth(){alert('Bluetooth connection placeholder')}
-async function syncFromAPI(url){alert('API sync placeholder: '+url)}
-let ws=null
-function connectWebSocket(url){alert('WebSocket connection placeholder: '+url)}
+/* API polling */
+let apiInterval=null;
+async function syncFromAPI(url){
+  try{
+    const res = await fetch(url);
+    const data = await res.json();
+    updateDashboard(data);
+    byId('deviceStatus').textContent='API Connected';
+    mockRunning=false;
+  }catch(err){console.error(err);byId('deviceStatus').textContent='API Error';}
+}
+byId('btnAPI').addEventListener('click',()=>{
+  const url = byId('deviceUrl').value.trim(); if(!url){alert('Enter URL');return;}
+  if(apiInterval) clearInterval(apiInterval);
+  syncFromAPI(url);
+  apiInterval = setInterval(()=>syncFromAPI(url),5000);
+});
 
-byId('btnBluetooth').addEventListener('click',connectBluetooth)
-byId('btnAPI').addEventListener('click',()=>{const url=byId('deviceUrl').value.trim();if(!url){alert('Enter URL');return}syncFromAPI(url)})
-byId('btnWS').addEventListener('click',()=>{const url=byId('deviceUrl').value.trim();if(!url){alert('Enter URL');return}connectWebSocket(url)})
+/* WebSocket */
+let ws=null;
+function connectWebSocket(url){
+  if(ws) ws.close();
+  ws = new WebSocket(url);
+  ws.onopen = ()=>{byId('deviceStatus').textContent='WebSocket Connected'; mockRunning=false;}
+  ws.onmessage = e=>{
+    try{const data=JSON.parse(e.data); updateDashboard(data);}catch(err){console.error(err);}
+  }
+  ws.onerror = e=>{console.error(e); byId('deviceStatus').textContent='WS Error';}
+  ws.onclose = ()=>byId('deviceStatus').textContent='WebSocket Disconnected';
+}
+byId('btnWS').addEventListener('click',()=>{
+  const url = byId('deviceUrl').value.trim(); if(!url){alert('Enter WS URL');return;}
+  connectWebSocket(url);
+});
+
+/* Bluetooth */
+async function connectBluetooth(){
+  try{
+    const device = await navigator.bluetooth.requestDevice({filters:[{services:['battery_service']}]});
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService('battery_service');
+    const characteristic = await service.getCharacteristic('battery_level'); 
+    const value = await characteristic.readValue();
+    const battery = value.getUint8(0);
+    byId('deviceStatus').textContent=`Battery Level: ${battery}%`;
+    updateDashboard({total:battery,high:battery/5,medium:battery/3,low:battery/2,recentAlerts:[],active:[]});
+    mockRunning=false;
+  }catch(err){console.error(err);byId('deviceStatus').textContent='Bluetooth Error';}
+}
+byId('btnBluetooth').addEventListener('click',connectBluetooth);
 
 </script>
 </body>
