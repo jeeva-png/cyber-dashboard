@@ -1,502 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Cyber Threat Detection Dashboard</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyber Security Threat Dashboard</title>
 
-  <!-- Chart.js CDN -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
-  <style>
-    :root{
-      --bg:#0b0f19;
-      --panel:#0f1724;
-      --muted:#97a6b2;
-      --neon1:#00eaff;
-      --neon2:#00ff88;
-      --accent:#06b6d4;
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0;
-      font-family:Inter,Segoe UI,Roboto,system-ui,Arial;
-      background: linear-gradient(180deg,#05060a 0%, #071028 100%);
-      color:#e6f9ff;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      padding:18px;
-    }
-    header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:20px;
-      margin-bottom:18px;
-    }
-    h1{margin:0;font-size:20px}
-    .subtitle{color:var(--muted);font-size:13px}
-    .status-badge{
-      padding:8px 12px;border-radius:999px;font-weight:700;font-size:13px;
-      display:inline-flex;align-items:center;gap:8px;
-    }
-    .status-sec{background:#063b2f;color:var(--neon2)}
-    .status-mod{background:#4b3a05;color:#ffea8a}
-    .status-high{background:#3b0f12;color:#ffd6d6}
+<style>
+  :root{
+    --bg:#0b0f19;
+    --panel:#0f1724;
+    --muted:#97a6b2;
+    --neon1:#00eaff;
+    --neon2:#00ff88;
+    --accent:#06b6d4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,sans-serif}
+  body{
+    background:var(--bg);
+    color:#e6f9ff;
+    padding:16px;
+  }
 
-    /* layout */
-    .grid {display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
-    .card {background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03)}
-    .col-3 {grid-column:span 3}
-    .col-4 {grid-column:span 4}
-    .col-5 {grid-column:span 5}
-    .col-6 {grid-column:span 6}
-    .col-8 {grid-column:span 8}
-    .col-9 {grid-column:span 9}
-    .col-12 {grid-column:span 12}
+  /* Header */
+  header{
+    display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;
+  }
+  h1{font-size:22px;}
+  .subtitle{font-size:13px;color:var(--muted)}
 
-    /* responsive */
-    @media (max-width:1000px){
-      .col-3,.col-4,.col-5,.col-6,.col-8,.col-9{grid-column:span 12}
-    }
+  .status-badge{
+    padding:6px 12px;border-radius:999px;font-weight:700;font-size:13px;display:inline-flex;align-items:center;gap:8px;
+  }
+  .status-sec{background:#063b2f;color:var(--neon2)}
+  .status-mod{background:#4b3a05;color:#ffea8a}
+  .status-high{background:#3b0f12;color:#ffd6d6}
 
-    /* summary */
-    .summary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .stat-title{font-size:12px;color:var(--muted);margin-bottom:6px}
-    .stat-value{font-size:22px;font-weight:800}
+  /* Layout */
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);}
+  .col-3{grid-column:span 3;}
+  .col-4{grid-column:span 4;}
+  .col-5{grid-column:span 5;}
+  .col-6{grid-column:span 6;}
+  .col-7{grid-column:span 7;}
+  .col-12{grid-column:span 12;}
 
-    .btn {padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700}
-    .btn-neon{background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#002;box-shadow:0 6px 18px rgba(0,255,200,0.06)}
-    .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--neon1)}
+  @media (max-width:1000px){
+    .col-3,.col-4,.col-5,.col-6,.col-7{grid-column:span 12}
+  }
 
-    table{width:100%;border-collapse:collapse;font-size:13px}
-    th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
-    th{color:var(--muted);font-size:12px}
-    .sev-high{color:#ff7b7b;font-weight:700}
-    .sev-med{color:#ffd27a;font-weight:700}
-    .sev-low{color:#8fffc8;font-weight:700}
-    .small{font-size:12px;color:var(--muted)}
+  /* Summary */
+  .stat-title{font-size:12px;color:var(--muted);margin-bottom:6px}
+  .stat-value{font-size:22px;font-weight:800}
 
-    .progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--neon1),var(--neon2));}
+  /* Buttons */
+  .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;transition:all 0.2s;}
+  .btn-neon{background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#002;box-shadow:0 6px 18px rgba(0,255,200,0.2);}
+  .btn-neon:hover{box-shadow:0 8px 24px rgba(0,255,200,0.4);transform:translateY(-2px);}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--neon1);}
+  .btn-ghost:hover{background:rgba(0,255,200,0.05);}
 
-    /* footer */
-    footer{margin-top:18px;color:var(--muted);font-size:12px}
-  </style>
+  /* Table */
+  table{width:100%;border-collapse:collapse;font-size:13px;overflow-x:auto;display:block;}
+  th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
+  th{color:var(--muted);font-size:12px;}
+  .sev-high{color:#ff7b7b;font-weight:700}
+  .sev-med{color:#ffd27a;font-weight:700}
+  .sev-low{color:#8fffc8;font-weight:700}
+
+  /* Progress bars */
+  .progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--neon1),var(--neon2));transition:width 0.5s ease-in-out;}
+
+  /* Footer */
+  footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center;}
+
+</style>
 </head>
 <body>
 
-  <header>
-    <div>
-      <h1>Threat Detection & Monitoring</h1>
-      <div class="subtitle">Single-file dashboard — supports Bluetooth / WiFi / WebSocket syncing</div>
+<header>
+  <div>
+    <h1>Cyber Threat Detection Dashboard</h1>
+    <div class="subtitle">Responsive, single-file, real-time monitoring</div>
+  </div>
+  <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:8px">
+    <div id="statusBadge" class="status-badge status-sec">Secure</div>
+    <div style="text-align:right">
+      <div class="subtitle">Last update</div>
+      <div id="lastUpdate" class="subtitle">--</div>
     </div>
+  </div>
+</header>
 
-    <div style="display:flex;gap:12px;align-items:center">
-      <div id="statusBadge" class="status-badge status-sec">Secure</div>
-      <div style="text-align:right">
-        <div class="small">Last update</div>
-        <div id="lastUpdate" class="small">--</div>
+<!-- Top summary -->
+<div class="grid" style="margin-bottom:16px">
+  <div class="card col-3"><div class="stat-title">Total Threats</div><div id="totalThreats" class="stat-value">0</div></div>
+  <div class="card col-3"><div class="stat-title">High</div><div id="highThreats" class="stat-value">0</div></div>
+  <div class="card col-3"><div class="stat-title">Medium</div><div id="medThreats" class="stat-value">0</div></div>
+  <div class="card col-3"><div class="stat-title">Low</div><div id="lowThreats" class="stat-value">0</div></div>
+</div>
+
+<div class="grid">
+  <!-- Left Column -->
+  <div class="col-5">
+    <div class="card" style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap">
+        <div><div style="font-weight:800">Device Sync</div><div class="subtitle">Bluetooth / API / WebSocket</div></div>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button class="btn btn-neon" id="btnBluetooth">Bluetooth</button>
+          <button class="btn btn-ghost" id="btnAPI">Sync API</button>
+          <button class="btn btn-ghost" id="btnWS">WebSocket</button>
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div id="deviceStatus" class="subtitle">Not connected</div>
+        <input id="deviceUrl" type="text" placeholder="API or WS URL" style="width:100%;margin-top:8px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit">
       </div>
     </div>
-  </header>
 
-  <!-- top summary -->
-  <div class="grid" style="margin-bottom:16px">
-    <div class="card col-3">
-      <div class="stat-title">Total Threats</div>
-      <div id="totalThreats" class="stat-value">0</div>
+    <div class="card" style="margin-bottom:12px">
+      <div style="font-weight:800;margin-bottom:8px">Recent Alerts</div>
+      <table aria-label="Recent alerts">
+        <thead><tr><th>Time</th><th>Type</th><th>Severity</th><th>Source</th></tr></thead>
+        <tbody id="alertsTable"></tbody>
+      </table>
     </div>
 
-    <div class="card col-3">
-      <div class="stat-title">High</div>
-      <div id="highThreats" class="stat-value">0</div>
-    </div>
-
-    <div class="card col-3">
-      <div class="stat-title">Medium</div>
-      <div id="medThreats" class="stat-value">0</div>
-    </div>
-
-    <div class="card col-3">
-      <div class="stat-title">Low</div>
-      <div id="lowThreats" class="stat-value">0</div>
+    <div class="card">
+      <div style="font-weight:800;margin-bottom:8px">Active Threats</div>
+      <div id="activeThreats"></div>
     </div>
   </div>
 
-  <div class="grid">
-    <!-- Left: Device & recent alerts -->
-    <div class="col-5">
-      <div class="card" style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div style="font-weight:800">Device Sync</div>
-            <div class="small">Connect to device via Bluetooth / WiFi / WebSocket</div>
-          </div>
-          <div style="display:flex;gap:8px">
-            <button class="btn btn-neon" id="btnBluetooth">Bluetooth</button>
-            <button class="btn btn-ghost" id="btnAPI">Sync API</button>
-            <button class="btn btn-ghost" id="btnWS">WebSocket</button>
-          </div>
-        </div>
-
-        <div style="margin-top:12px">
-          <div id="deviceStatus" class="small">Not connected</div>
-          <div style="margin-top:10px">
-            <label class="small">API / Device URL</label>
-            <input id="deviceUrl" type="text" placeholder="e.g. https://192.168.1.10/api/threats or ws://192.168.1.10:8080" style="width:100%;padding:8px;margin-top:6px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit"/>
-          </div>
-        </div>
+  <!-- Right Column -->
+  <div class="col-7">
+    <div class="card" style="height:360px;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <div style="font-weight:800">Threat Trends</div>
+        <div class="subtitle">Last 12 points</div>
       </div>
-
-      <div class="card" style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:800">Recent Alerts</div>
-          <div class="small">auto refresh</div>
-        </div>
-
-        <table aria-label="Recent alerts">
-          <thead>
-            <tr><th>Time</th><th>Type</th><th>Severity</th><th>Source</th></tr>
-          </thead>
-          <tbody id="alertsTable"></tbody>
-        </table>
-      </div>
-
-      <div class="card">
-        <div style="font-weight:800;margin-bottom:8px">Active Threats</div>
-        <div id="activeThreats"></div>
+      <div style="flex:1"><canvas id="trendChart" style="width:100%;height:100%"></canvas></div>
+      <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
+        <button class="btn btn-ghost" id="toggleMock">Stop Mock</button>
+        <div class="subtitle" id="mockStatus">Mocking: ON</div>
       </div>
     </div>
-
-    <!-- Right: Chart and details -->
-    <div class="col-7">
-      <div class="card" style="height:360px;display:flex;flex-direction:column">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-          <div style="font-weight:800">Threat Trends</div>
-          <div class="small">last 12 points</div>
-        </div>
-
-        <div style="flex:1">
-          <canvas id="trendChart" style="width:100%;height:100%"></canvas>
-        </div>
-
-        <div style="display:flex;gap:12px;margin-top:12px;align-items:center">
-          <button class="btn btn-ghost" id="toggleMock">Stop Mock</button>
-          <div class="small" id="mockStatus">Mocking: ON</div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:12px">
-        <div style="font-weight:800;margin-bottom:8px">Notes</div>
-        <div class="small">
-          • Bluetooth API works only on secure contexts (HTTPS or localhost). Replace the sample service/characteristic with your device's UUIDs.<br>
-          • Replace example API and WebSocket URLs in the input box before connecting.<br>
-          • `updateDashboard(data)` is the canonical function called by device integrations. Data schema example below.
-        </div>
+    <div class="card" style="margin-top:12px">
+      <div style="font-weight:800;margin-bottom:8px">Notes</div>
+      <div class="subtitle">
+        • Mobile & desktop responsive<br>
+        • Replace example API / WebSocket URLs<br>
+        • Bluetooth works on HTTPS / localhost
       </div>
     </div>
   </div>
+</div>
 
-  <footer>
-    <div class="small">Single-file dashboard — save as <code>cyber_dashboard.html</code>. Chart.js via CDN.</div>
-  </footer>
+<footer>Single-file responsive dashboard — Chart.js via CDN</footer>
 
 <script>
-/* ------------------------------
-  Data model and helpers
-   Expected data schema consumed by updateDashboard(data):
-   {
-     total: number,
-     high: number,
-     medium: number,
-     low: number,
-     recentAlerts: [{time,type,severity,src}],
-     active: [{name,severity,progress}],
-     timestamp: ISOString or ms
-   }
----------------------------------*/
-
+/* Utility */
 function byId(id){return document.getElementById(id)}
 function nowIso(){ return new Date().toLocaleString() }
 
-/* Chart.js setup */
+/* Chart setup */
 const ctx = byId('trendChart').getContext('2d')
-const initialLabels = Array.from({length:12}).map((_,i)=>`${i===11?'Now':`T-${11-i}`}`)
+const initialLabels = Array.from({length:12}).map((_,i)=>`T-${11-i}`)
 const initialData = Array.from({length:12}).map(()=>0)
-const chart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: initialLabels,
-    datasets: [
-      { label:'High', data:initialData.slice(), borderColor:'#ff7b7b', tension:0.3, fill:false, pointRadius:2 },
-      { label:'Medium', data:initialData.slice(), borderColor:'#ffd27a', tension:0.3, fill:false, pointRadius:2 },
-      { label:'Low', data:initialData.slice(), borderColor:'#8fffc8', tension:0.3, fill:false, pointRadius:2 }
-    ]
-  },
-  options: {
-    animation:false,
-    scales:{ x:{ grid:{color:'rgba(255,255,255,0.03)'} }, y:{ grid:{color:'rgba(255,255,255,0.03)'} } },
-    plugins:{ legend:{ labels:{ color:'#bfeffd' } } }
-  }
+const chart = new Chart(ctx,{
+  type:'line',
+  data:{labels:initialLabels,datasets:[
+    {label:'High',data:initialData.slice(),borderColor:'#ff7b7b',tension:0.3,fill:false,pointRadius:2},
+    {label:'Medium',data:initialData.slice(),borderColor:'#ffd27a',tension:0.3,fill:false,pointRadius:2},
+    {label:'Low',data:initialData.slice(),borderColor:'#8fffc8',tension:0.3,fill:false,pointRadius:2}
+  ]},
+  options:{animation:false,scales:{x:{grid:{color:'rgba(255,255,255,0.03)'}},y:{grid:{color:'rgba(255,255,255,0.03)'}}},plugins:{legend:{labels:{color:'#bfeffd'}}}}
 })
 
-/* updateDashboard: main function to update DOM and chart */
+/* Update Dashboard */
 function updateDashboard(data){
-  if(!data) return
-  byId('totalThreats').textContent = data.total ?? ( (data.high??0) + (data.medium??0) + (data.low??0) )
+  byId('totalThreats').textContent = data.total ?? ((data.high??0)+(data.medium??0)+(data.low??0))
   byId('highThreats').textContent = data.high ?? 0
   byId('medThreats').textContent = data.medium ?? 0
   byId('lowThreats').textContent = data.low ?? 0
-  byId('deviceStatus').textContent = 'Last sync: ' + (data.timestamp ? new Date(data.timestamp).toLocaleString() : nowIso())
+  byId('deviceStatus').textContent = 'Last sync: '+(data.timestamp ? new Date(data.timestamp).toLocaleString() : nowIso())
   byId('lastUpdate').textContent = nowIso()
 
-  // status badge
   const statusBadge = byId('statusBadge')
   const high = data.high ?? 0
-  if(high >= 8){ statusBadge.className='status-badge status-high'; statusBadge.textContent='High Alert' }
-  else if(high >= 4){ statusBadge.className='status-badge status-mod'; statusBadge.textContent='Moderate' }
-  else { statusBadge.className='status-badge status-sec'; statusBadge.textContent='Secure' }
+  if(high>=8){statusBadge.className='status-badge status-high';statusBadge.textContent='High Alert'}
+  else if(high>=4){statusBadge.className='status-badge status-mod';statusBadge.textContent='Moderate'}
+  else{statusBadge.className='status-badge status-sec';statusBadge.textContent='Secure'}
 
-  // recent alerts table
   const alertsTable = byId('alertsTable')
-  alertsTable.innerHTML = ''
+  alertsTable.innerHTML=''
   const recent = data.recentAlerts ?? []
   for(const a of recent.slice(0,8)){
-    const tr = document.createElement('tr')
-    tr.innerHTML = `<td>${a.time}</td>
-                    <td>${a.type}</td>
-                    <td class="${a.severity==='High'?'sev-high':a.severity==='Medium'?'sev-med':'sev-low'}">${a.severity}</td>
-                    <td>${a.src}</td>`
+    const tr=document.createElement('tr')
+    tr.innerHTML=`<td>${a.time}</td><td>${a.type}</td><td class="${a.severity==='High'?'sev-high':a.severity==='Medium'?'sev-med':'sev-low'}">${a.severity}</td><td>${a.src}</td>`
     alertsTable.appendChild(tr)
   }
 
-  // active threats
-  const activeEl = byId('activeThreats')
-  activeEl.innerHTML = ''
-  const active = data.active ?? []
+  const activeEl=byId('activeThreats')
+  activeEl.innerHTML=''
+  const active=data.active ?? []
   for(const t of active.slice(0,6)){
-    const wrap = document.createElement('div')
-    wrap.style.marginBottom = '10px'
-    wrap.innerHTML = `<div style="display:flex;justify-content:space-between;font-weight:700">
-                        <div>${t.name}</div><div class="small">${t.progress ?? 0}%</div>
-                      </div>
-                      <div class="progress-bar"><div class="progress-fill" style="width:${t.progress ?? 0}%"></div></div>`
+    const wrap=document.createElement('div');wrap.style.marginBottom='10px'
+    wrap.innerHTML=`<div style="display:flex;justify-content:space-between;font-weight:700"><div>${t.name}</div><div class="subtitle">${t.progress ?? 0}%</div></div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${t.progress ?? 0}%"></div></div>`
     activeEl.appendChild(wrap)
   }
 
-  // push values to chart (simple rolling)
-  const h = data.high ?? 0, m = data.medium ?? 0, l = data.low ?? 0
+  // push chart
+  const h=data.high??0,m=data.medium??0,l=data.low??0
   pushToChart(h,m,l)
 }
 
-/* Chart helper: push rolling values */
 function pushToChart(h,m,l){
-  const maxPoints = 12
+  const maxPoints=12
   chart.data.labels.push(new Date().toLocaleTimeString())
   chart.data.datasets[0].data.push(h)
   chart.data.datasets[1].data.push(m)
   chart.data.datasets[2].data.push(l)
-  while(chart.data.labels.length > maxPoints){
-    chart.data.labels.shift()
-    chart.data.datasets.forEach(ds=>ds.data.shift())
-  }
+  while(chart.data.labels.length>maxPoints){chart.data.labels.shift();chart.data.datasets.forEach(ds=>ds.data.shift())}
   chart.update()
 }
 
-/* -----------------------------
-  Mock data generator (can be disabled)
-------------------------------*/
-let mockRunning = true
-const types = ['Malware','Port Scan','Unauthorized Login','Phishing','Ransomware']
-function randomInt(a,b){ return Math.floor(Math.random()*(b-a+1))+a }
+/* Mock Data */
+let mockRunning=true
+const types=['Malware','Port Scan','Unauthorized Login','Phishing','Ransomware']
+function randomInt(a,b){return Math.floor(Math.random()*(b-a+1))+a}
 
 function generateMock(){
-  const high = randomInt(0,12)
-  const med = randomInt(0,18)
-  const low = randomInt(0,28)
-  const total = high + med + low
-  const recent = Array.from({length:6}).map(()=>({
-    time: new Date().toLocaleTimeString(),
-    type: types[randomInt(0,types.length-1)],
-    severity: ['Low','Medium','High'][randomInt(0,2)],
-    src: `${randomInt(10,255)}.${randomInt(0,255)}.${randomInt(0,255)}.${randomInt(1,254)}`
-  }))
-  const active = [
-    {name:'Suspicious Login Bot',severity:'High',progress:randomInt(10,90)},
-    {name:'Unknown Outbound Traffic',severity:'Medium',progress:randomInt(20,85)}
-  ]
-  return { total, high, medium:med, low, recentAlerts:recent, active, timestamp:Date.now() }
+  const high=randomInt(0,12),med=randomInt(0,18),low=randomInt(0,28),total=high+med+low
+  const recent=Array.from({length:6}).map(()=>({time:new Date().toLocaleTimeString(),type:types[randomInt(0,types.length-1)],severity:['Low','Medium','High'][randomInt(0,2)],src:`${randomInt(10,255)}.${randomInt(0,255)}.${randomInt(0,255)}.${randomInt(1,254)}`}))
+  const active=[{name:'Suspicious Login Bot',severity:'High',progress:randomInt(10,90)},{name:'Unknown Outbound Traffic',severity:'Medium',progress:randomInt(20,85)}]
+  return {total,high,medium:med,low,recentAlerts:recent,active,timestamp:Date.now()}
 }
 
-let mockInterval = setInterval(()=>{
-  if(!mockRunning) return
-  const d = generateMock()
-  updateDashboard(d)
-}, 5000)
+let mockInterval=setInterval(()=>{if(!mockRunning) return; updateDashboard(generateMock())},5000)
 updateDashboard(generateMock())
-
-byId('toggleMock').addEventListener('click', ()=>{
-  mockRunning = !mockRunning
-  byId('mockStatus').textContent = `Mocking: ${mockRunning ? 'ON' : 'OFF'}`
-  byId('toggleMock').textContent = mockRunning ? 'Stop Mock' : 'Start Mock'
+byId('toggleMock').addEventListener('click',()=>{
+  mockRunning=!mockRunning
+  byId('mockStatus').textContent=`Mocking: ${mockRunning?'ON':'OFF'}`
+  byId('toggleMock').textContent=mockRunning?'Stop Mock':'Start Mock'
 })
 
-/* -----------------------------
-  Real device sync implementations
-------------------------------*/
+/* Device sync placeholders */
+async function connectBluetooth(){alert('Bluetooth connection placeholder')}
+async function syncFromAPI(url){alert('API sync placeholder: '+url)}
+let ws=null
+function connectWebSocket(url){alert('WebSocket connection placeholder: '+url)}
 
-/* 1) Web Bluetooth example
-   Replace serviceUUID and characteristicUUID with your device values.
-   NOTE: Web Bluetooth requires HTTPS or localhost and user gesture.
-*/
-async function connectBluetooth(){
-  if(!navigator.bluetooth){
-    alert('Web Bluetooth not supported in this browser.')
-    return
-  }
-  try{
-    byId('deviceStatus').textContent = 'Requesting Bluetooth device...'
-    // Example filter: devices advertising a known service; adjust as needed.
-    const device = await navigator.bluetooth.requestDevice({
-      // filters: [{ services: ['your_service_uuid_here'] }],
-      acceptAllDevices: true,
-      optionalServices: ['battery_service'] // example; replace with your service
-    })
-    byId('deviceStatus').textContent = `Connecting to ${device.name || 'device'}...`
-    const server = await device.gatt.connect()
-
-    // Example reading battery level if available
-    try {
-      const service = await server.getPrimaryService('battery_service')
-      const char = await service.getCharacteristic('battery_level')
-      const val = await char.readValue()
-      const battery = val.getUint8(0)
-      byId('deviceStatus').textContent = `Bluetooth connected — battery ${battery}%`
-    } catch(e){
-      // if battery service not available, just indicate connection
-      byId('deviceStatus').textContent = 'Bluetooth connected (service not read)'
-    }
-
-    // Example: if your device streams notifications on a custom characteristic:
-    // const svc = await server.getPrimaryService('your_service_uuid')
-    // const chr = await svc.getCharacteristic('your_char_uuid')
-    // await chr.startNotifications()
-    // chr.addEventListener('characteristicvaluechanged', ev => {
-    //   const payload = parseYourDeviceData(ev.target.value) // implement parse
-    //   updateDashboard(payload)
-    // })
-
-  } catch(err){
-    console.error('Bluetooth error',err)
-    byId('deviceStatus').textContent = 'Bluetooth error: ' + (err.message || err)
-  }
-}
-
-/* 2) Sync via REST API (fetch)
-   Expects JSON endpoint that returns object matching the updateDashboard schema.
-*/
-async function syncFromAPI(url){
-  try{
-    byId('deviceStatus').textContent = 'Syncing via API...'
-    const res = await fetch(url, { method:'GET', cache:'no-cache' })
-    if(!res.ok) throw new Error('HTTP ' + res.status)
-    const json = await res.json()
-    // Validate/normalize simple fields if needed
-    // If your API fields differ, transform here to expected schema
-    updateDashboard({
-      total: json.total ?? (json.high + json.medium + json.low),
-      high: json.high ?? json.highRisk ?? 0,
-      medium: json.medium ?? json.mediumRisk ?? 0,
-      low: json.low ?? json.lowRisk ?? 0,
-      recentAlerts: json.recentAlerts ?? json.alerts ?? [],
-      active: json.active ?? json.activeThreats ?? [],
-      timestamp: Date.now()
-    })
-    byId('deviceStatus').textContent = 'API sync successful'
-  }catch(err){
-    console.error('API sync error',err)
-    byId('deviceStatus').textContent = 'API sync error: ' + (err.message || err)
-  }
-}
-
-/* 3) WebSocket streaming (device pushes JSON messages)
-   Expected messages are JSON matching updateDashboard fields or partial updates.
-*/
-let ws = null
-function connectWebSocket(url){
-  try{
-    if(ws && (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING)){
-      ws.close()
-    }
-    ws = new WebSocket(url)
-    byId('deviceStatus').textContent = 'WebSocket connecting...'
-    ws.onopen = ()=> byId('deviceStatus').textContent = 'WebSocket connected'
-    ws.onmessage = (evt)=>{
-      try{
-        const json = JSON.parse(evt.data)
-        // If message is partial, merge/normalize as necessary
-        updateDashboard({
-          total: json.total ?? (json.high + json.medium + json.low),
-          high: json.high ?? json.highRisk ?? 0,
-          medium: json.medium ?? json.mediumRisk ?? 0,
-          low: json.low ?? json.lowRisk ?? 0,
-          recentAlerts: json.recentAlerts ?? json.alerts ?? [],
-          active: json.active ?? json.activeThreats ?? [],
-          timestamp: json.timestamp ?? Date.now()
-        })
-      }catch(e){
-        console.error('WS message parse error', e)
-      }
-    }
-    ws.onerror = (e)=> { console.error('WebSocket error', e); byId('deviceStatus').textContent = 'WS error' }
-    ws.onclose = ()=> { byId('deviceStatus').textContent = 'WebSocket closed' }
-  }catch(e){
-    console.error('WebSocket connect error', e)
-    byId('deviceStatus').textContent = 'WS connection failed'
-  }
-}
-
-/* UI bindings for buttons */
-byId('btnBluetooth').addEventListener('click', async ()=>{
-  await connectBluetooth()
-})
-
-byId('btnAPI').addEventListener('click', async ()=>{
-  const url = byId('deviceUrl').value.trim()
-  if(!url){ alert('Type the API URL in the input box'); return }
-  await syncFromAPI(url)
-})
-
-byId('btnWS').addEventListener('click', ()=>{
-  const url = byId('deviceUrl').value.trim()
-  if(!url){ alert('Type the WebSocket URL in the input box'); return }
-  connectWebSocket(url)
-})
-
-/* -----------------------------
-  Quick notes & helpers for device implementers
-  - If your device sends binary payloads:
-      parse with DataView and map to fields
-  - For Bluetooth notifications:
-      use startNotifications() and a handler that transforms bytes -> JSON schema
-  - For WebSocket messages:
-      device can push small JSON messages frequently; this UI updates smoothly
-------------------------------*/
-
-/* Optional: example of parsing a binary payload (uncomment and adapt)
-function parseYourDeviceData(valueDataView){
-  // example: first byte = high, second = medium, third = low
-  return {
-    total: valueDataView.getUint8(0),
-    high: valueDataView.getUint8(1),
-    medium: valueDataView.getUint8(2),
-    low: valueDataView.getUint8(3),
-    recentAlerts: [],
-    active: []
-  }
-}
-*/
+byId('btnBluetooth').addEventListener('click',connectBluetooth)
+byId('btnAPI').addEventListener('click',()=>{const url=byId('deviceUrl').value.trim();if(!url){alert('Enter URL');return}syncFromAPI(url)})
+byId('btnWS').addEventListener('click',()=>{const url=byId('deviceUrl').value.trim();if(!url){alert('Enter URL');return}connectWebSocket(url)})
 
 </script>
 </body>
