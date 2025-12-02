@@ -3,8 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cyber Threat Detection Dashboard - Real-Time</title>
-
+<title>Cyber Threat Detection Dashboard</title>
 <style>
 :root{
   --bg:#0b0f19; --panel:#0f1724; --muted:#97a6b2;
@@ -12,15 +11,19 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Segoe UI,Roboto,sans-serif;}
 body{
-  background:linear-gradient(135deg, #0b0f19, #0c1122, #0b0f19);
+  background:#0b0f19;
   overflow-x:hidden;
   color:#e6f9ff;
   padding:16px;
-  animation: bgMove 20s linear infinite;
+  position:relative;
 }
-@keyframes bgMove{
-  0%{background-position:0 0;}
-  100%{background-position:500px 500px;}
+body::before{
+  content:"";position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle,rgba(0,255,255,0.05),transparent 70%),radial-gradient(circle,rgba(255,0,255,0.05),transparent 70%);
+  background-size:200% 200%;animation:moveBg 20s linear infinite;z-index:-1;
+}
+@keyframes moveBg{
+  0%{background-position:0 0,0 0;}
+  100%{background-position:200% 200%,200% 200%;}
 }
 header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;margin-bottom:16px;}
 h1{font-size:22px;text-shadow:0 0 12px var(--neon1),0 0 24px var(--neon2);}
@@ -43,8 +46,6 @@ h1{font-size:22px;text-shadow:0 0 12px var(--neon1),0 0 24px var(--neon2);}
   50%{text-shadow:0 0 14px #ff8888,0 0 20px #ff4444;}
   100%{text-shadow:0 0 8px #ff5555,0 0 12px #ff2222;}
 }
-
-/* Layout */
 .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;}
 .card{background:var(--panel); padding:14px; border-radius:12px; border:1px solid rgba(255,255,255,0.03);
 box-shadow:0 0 10px rgba(0,255,255,0.15),0 0 20px rgba(0,255,200,0.1);
@@ -56,38 +57,24 @@ transition:0.3s;animation:cardPulse 3s infinite alternate;}
 }
 .col-3{grid-column:span 3;}.col-4{grid-column:span 4;}.col-5{grid-column:span 5;}.col-6{grid-column:span 6;}.col-7{grid-column:span 7;}.col-12{grid-column:span 12;}
 @media (max-width:1000px){.col-3,.col-4,.col-5,.col-6,.col-7{grid-column:span 12}}
-
-/* Summary */
 .stat-title{font-size:12px;color:var(--muted);margin-bottom:6px;text-shadow:0 0 4px #000;}
 .stat-value{font-size:22px;font-weight:800;text-shadow:0 0 8px var(--neon1);}
-
-/* Buttons */
 .btn{padding:8px 12px;border-radius:8px;border:0;cursor:pointer;font-weight:700;transition:all 0.3s;text-shadow:0 0 4px #000;}
 .btn-neon{background:linear-gradient(90deg,var(--neon1),var(--neon2));color:#002;box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);animation:btnGlow 2s infinite alternate;}
 .btn-neon:hover{box-shadow:0 0 18px var(--neon1),0 0 28px var(--neon2);transform:translateY(-2px);}
 @keyframes btnGlow{0%{box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);}50%{box-shadow:0 0 16px var(--neon1),0 0 26px var(--neon2);}100%{box-shadow:0 0 10px var(--neon1),0 0 20px var(--neon2);}}
 .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--neon1);}
 .btn-ghost:hover{background:rgba(0,255,200,0.05);}
-
-/* Table */
 table{width:100%;border-collapse:collapse;font-size:13px;overflow-x:auto;display:block;}
 th,td{padding:8px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.03)}
 th{color:var(--muted);font-size:12px;}
 .sev-high{color:#ff7b7b;font-weight:700;text-shadow:0 0 4px #ff0000;animation:alertPulse 1s infinite alternate;}
 .sev-med{color:#ffd27a;font-weight:700;text-shadow:0 0 4px #ff8800;}
 .sev-low{color:#8fffc8;font-weight:700;text-shadow:0 0 4px #00ff88;}
-@keyframes alertPulse{
-  0%{text-shadow:0 0 4px #ff0000;}
-  50%{text-shadow:0 0 12px #ff2222;}
-  100%{text-shadow:0 0 4px #ff0000;}
-}
-
-/* Progress bars */
+@keyframes alertPulse{0%{text-shadow:0 0 4px #ff0000;}50%{text-shadow:0 0 12px #ff2222;}100%{text-shadow:0 0 4px #ff0000;}}
 .progress-bar{height:10px;background:rgba(255,255,255,0.03);border-radius:8px;overflow:hidden;}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--neon1),var(--neon2));transition:width 0.5s ease-in-out;animation:barPulse 1.5s infinite alternate;}
 @keyframes barPulse{0%{opacity:0.8;}50%{opacity:1;}100%{opacity:0.8;}}
-
-/* Footer */
 footer{margin-top:18px;color:var(--muted);font-size:12px;text-align:center;text-shadow:0 0 4px #000;}
 </style>
 </head>
@@ -208,7 +195,6 @@ byId('btnWS').addEventListener('click',()=>{
   mockRunning=false; startWS(url)
 })
 byId('btnBluetooth').addEventListener('click',connectBluetooth)
-byId('toggleMock')?.addEventListener('click',()=>{mockRunning=!mockRunning;byId('mockStatus').textContent=`Mocking: ${mockRunning?'ON':'OFF'}`})
 
 /* API polling */
 let apiInterval=null;
